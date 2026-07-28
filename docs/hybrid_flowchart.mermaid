@@ -1,0 +1,61 @@
+flowchart TD
+    Start(["🎓 Sinh viên/Thí sinh đặt câu hỏi"]) --> Classify{"🔀 Router phân loại độ phức tạp<br/>(theo config/test_cases.json)"}
+
+    %% ==============================
+    %% NHÁNH 1: CÂU HỎI ĐƠN GIẢN -> CHATBOT PATH
+    %% ==============================
+    Classify -->|"🟢 Đơn giản<br/>Tư vấn chung, kỹ năng mềm,<br/>không cần tra điểm/ngành thật<br/>(VD: TC1, TC2)"| ChatbotEntry["💬 run_baseline_chatbot()"]
+
+    subgraph ChatbotPath["💬 CHATBOT BASELINE PATH — src/prompts.py: CHATBOT_BASELINE_PROMPT"]
+        direction TB
+        ChatbotEntry --> ChatbotLLM["🧠 Gọi LLM 1 lượt duy nhất<br/>(không có Tool, không có vòng lặp)"]
+        ChatbotLLM --> ChatbotGuard{"Câu hỏi có đụng tới<br/>dữ liệu thật không?<br/>(điểm chuẩn, mã ngành...)"}
+        ChatbotGuard -->|"Không"| ChatbotAnswer["✅ Trả lời bằng kiến thức<br/>phổ quát của LLM"]
+        ChatbotGuard -->|"Có"| ChatbotRefuse["🛡️ Guardrail: thành thật từ chối,<br/>KHÔNG bịa dữ liệu,<br/>hướng dẫn liên hệ Phòng Đào Tạo"]
+    end
+
+    ChatbotAnswer --> Finish(["📤 Trả lời cho sinh viên"])
+    ChatbotRefuse --> Finish
+
+    %% ==============================
+    %% NHÁNH 2: CÂU HỎI PHỨC TẠP -> REACT AGENT PATH
+    %% ==============================
+    Classify -->|"🟡 Multi-step (cần Tool)<br/>có điểm số, cần tra ngành/<br/>điểm chuẩn/so sánh<br/>(VD: TC3, TC4, TC5, TC8)"| ReactEntry
+    Classify -->|"🔴 Edge Case (bẫy Guardrail)<br/>ngành không tồn tại,<br/>yêu cầu mâu thuẫn<br/>(VD: TC6, TC7)"| ReactEntry
+
+    ReactEntry["🤖 run_react_agent_2()"] --> ReactLoop
+
+    subgraph ReactPath["🤖 REACT AGENT PATH — src/prompts.py: REACT_SYSTEM_PROMPT + src/tools.py"]
+        direction TB
+        ReactLoop["🔄 Vòng lặp ReAct<br/>(step = 1..MAX_ITERATIONS = 5)"] --> Thought["🧠 Thought: LLM tự suy luận<br/>bước tiếp theo cần làm gì"]
+        Thought --> Decide{"LLM tự quyết định:<br/>cần gọi Tool hay đã đủ<br/>thông tin để trả lời?"}
+
+        Decide -->|"Cần thêm dữ liệu"| Action["🛠️ Action: chọn 1 trong các tool<br/>get_subjects_list / get_courses_list /<br/>search_courses_by_keyword /<br/>get_admission_info /<br/>check_eligibility_by_scores"]
+        Action --> Execute["⚙️ Hệ thống (không phải LLM)<br/>thực thi Tool thật trên src/tools.py"]
+        Execute --> ObsCheck{"Kết quả Tool là gì?"}
+
+        ObsCheck -->|"dict {'error': ...}"| ErrHandle["🛡️ Guardrail: đọc lỗi,<br/>báo mã không hợp lệ,<br/>hỏi lại thông tin"]
+        ObsCheck -->|"[] rỗng"| EmptyHandle["🛡️ Guardrail: KHÔNG bịa dữ liệu,<br/>báo không tìm thấy, hỏi lại"]
+        ObsCheck -->|"Dữ liệu thật hợp lệ"| Observation["👁️ Observation: nạp kết quả thật<br/>vào transcript cho vòng lặp sau"]
+
+        ErrHandle --> LoopCheck
+        EmptyHandle --> LoopCheck
+        Observation --> LoopCheck{"step < MAX_ITERATIONS?"}
+        LoopCheck -->|"Có, tiếp tục"| ReactLoop
+        LoopCheck -->|"Hết bước"| GuardrailStop["🛡️ GUARDRAIL TRIGGERED<br/>Dừng an toàn, không lặp vô hạn"]
+
+        Decide -->|"Đã đủ thông tin"| FinalCheck{"Final Answer có khớp<br/>với Observation THẬT<br/>gần nhất không?<br/>(điểm quan sát từ docs/trace_eval.md)"}
+        FinalCheck -->|"Khớp"| FinalAnswer["🏁 Final Answer: câu trả lời<br/>cá nhân hoá dựa trên dữ liệu thật"]
+        FinalCheck -->|"⚠️ Không khớp (hallucination)"| RiskNote["⚠️ Rủi ro đã ghi nhận thực tế (TC3):<br/>LLM có thể tự bịa Observation/Final Answer<br/>trong cùng 1 lượt sinh, bỏ qua dữ liệu thật.<br/>Cần siết prompt / thêm bước xác minh."]
+        RiskNote --> FinalAnswer
+    end
+
+    FinalAnswer --> Finish
+    GuardrailStop --> Finish
+
+    style ChatbotPath fill:#eef6ff,stroke:#4a90d9
+    style ReactPath fill:#fff4e6,stroke:#d98a1a
+    style RiskNote fill:#ffe0e0,stroke:#cc4444
+    style GuardrailStop fill:#ffe0e0,stroke:#cc4444
+    style ErrHandle fill:#fff0cc,stroke:#cc9900
+    style EmptyHandle fill:#fff0cc,stroke:#cc9900
