@@ -15,18 +15,20 @@
 
 ---
 
-## 🔍 2. SO SÁNH PHẢN HỒI (TEST CASE #3)
+## 🔍 2. SO SÁNH PHẢN HỒI (TEST CASE #2)
 
-**Câu hỏi**: *"Thời tiết ở Hà Nội hôm nay thế nào và tôi nên mặc gì đi chơi?"*
+**Câu hỏi**: *"Em có điểm học bạ Toán 8.5, Ngữ văn 7.5, Sinh 8.0 và thích công nghệ, em nên chọn chuyên ngành nào phù hợp?"*
 
 ### 🤖 Chatbot Baseline:
-* **Phản hồi**: *"Tôi không có truy cập Internet thời gian thực nên không biết thời tiết hôm nay ở Hà Nội."*
-* **Nhận xét**: An toàn nhưng không giải quyết được nhu cầu thực tế của người dùng.
+* **Phản hồi**: *"Với điểm số này và sở thích công nghệ, em có thể cân nhắc các ngành như Công nghệ thông tin, Khoa học máy tính hoặc Khoa học dữ liệu. Hãy lựa chọn ngành có cả nội dung lập trình và ứng dụng công nghệ."*
+* **Nhận xét**: Chatbot trả lời chung chung, không kiểm tra yêu cầu cụ thể của từng ngành và không lấy dữ liệu thực tế về điểm chuẩn, nên dễ thiếu chính xác.
 
-### 🧠 ReAct Agent:
-* **Thought 1**: Cần tra cứu thời tiết Hà Nội.
-* **Action 1**: `get_weather['Hà Nội']`
-* **Observation 1**: `Thời tiết Hà Nội: 28°C, Nắng nhẹ, Độ ẩm 65%.`
-* **Thought 2**: Đã có thông tin 28°C nắng nhẹ, đưa ra lời khuyên trang phục.
-* **Final Answer**: *"Thời tiết Hà Nội hôm nay 28°C, nắng nhẹ. Bạn nên mặc quần áo thoáng mát!"*
-* **Nhận xét**: Hoàn thành xuất sắc nhiệm vụ nhờ sự kết hợp giữa suy luận và công cụ.
+### 🧠 ReAct Agent (dự kiến):
+* **Thought 1**: Cần tra cứu yêu cầu điểm và môn chính của ngành Công nghệ thông tin và Khoa học dữ liệu.
+* **Action 1**: `get_course_prerequisites('Công nghệ thông tin')`
+* **Observation 1**: `Yêu cầu: Toán 8.0, Anh 7.0, ưu tiên học sinh có nền tảng lập trình.`
+* **Thought 2**: Kiểm tra nếu hồ sơ phù hợp với ngành này và so sánh với ngành Khoa học dữ liệu.
+* **Action 2**: `get_course_prerequisites('Khoa học dữ liệu')`
+* **Observation 2**: `Yêu cầu: Toán 8.5, Tiếng Anh 7.0, kỹ năng phân tích số liệu được ưu tiên.`
+* **Final Answer**: *"Với điểm Toán 8.5 và niềm đam mê công nghệ, em phù hợp với cả Công nghệ thông tin và Khoa học dữ liệu. Nếu em thích lập trình và ứng dụng phần mềm, chọn Công nghệ thông tin. Nếu em quan tâm phân tích dữ liệu và thống kê, chọn Khoa học dữ liệu."*
+* **Nhận xét**: Agent sẽ tận dụng tool lookup để đưa ra khuyến nghị sát thực tế hơn và giảm rủi ro trả lời bằng trực giác.

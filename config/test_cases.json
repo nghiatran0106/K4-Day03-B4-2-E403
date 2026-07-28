@@ -2,31 +2,49 @@
   {
     "id": 1,
     "category": "🟢 Đơn giản (Chỉ cần LLM)",
-    "question": "Thủ đô của Việt Nam là gì?",
-    "expected_behavior": "Chatbot trả lời trực tiếp từ kiến thức có sẵn."
+    "question": "Sinh viên năm nhất nên chuẩn bị những gì để vào đại học không bị bỡ ngỡ?",
+    "expected_behavior": "Chatbot trả lời bằng kiến thức chung về kỹ năng học tập, quản lý thời gian và hòa nhập môi trường học tập." 
   },
   {
     "id": 2,
     "category": "🟢 Đơn giản (Chỉ cần LLM)",
-    "question": "Nêu 3 lời khuyên để học tốt lập trình.",
-    "expected_behavior": "Chatbot trả lời trực tiếp từ kiến thức có sẵn."
+    "question": "Nêu 3 kỹ năng mềm quan trọng mà sinh viên cần phát triển ở năm đầu đại học.",
+    "expected_behavior": "Chatbot trả lời trực tiếp về kỹ năng giao tiếp, tự học và quản lý thời gian." 
   },
   {
     "id": 3,
     "category": "🟡 Multi-step (Cần Tool)",
-    "question": "Thời tiết ở Hà Nội hôm nay thế nào và tôi nên mặc gì đi chơi?",
-    "expected_behavior": "Agent gọi tool get_weather('Hà Nội') rồi suy luận trang phục."
+    "question": "Em có điểm học bạ Toán 8.5, Ngữ văn 7.5, Tiếng Anh 7.0 và thích công nghệ, em nên chọn ngành nào phù hợp?",
+    "expected_behavior": "Agent tra cứu yêu cầu đầu vào của ngành Công nghệ thông tin và Khoa học dữ liệu rồi khuyến nghị ngành phù hợp dựa trên hồ sơ và sở thích." 
   },
   {
     "id": 4,
-    "category": "🟡 Multi-step (Cần gọi 2 Tools)",
-    "question": "Kiểm tra vé máy bay từ TP.HCM đi Hà Nội ngày mai và dự báo thời tiết ở Hà Nội.",
-    "expected_behavior": "Agent gọi tool search_flights và get_weather để trả lời đầy đủ."
+    "category": "🟡 Multi-step (Cần Tool)",
+    "question": "So sánh yêu cầu đầu vào và môn học chính giữa ngành Công nghệ thông tin và Kỹ thuật phần mềm.",
+    "expected_behavior": "Agent gọi tool so sánh yêu cầu ngành để nêu rõ điểm giống và khác nhau giữa hai chương trình." 
   },
   {
     "id": 5,
+    "category": "🟡 Multi-step (Cần Tool)",
+    "question": "Em nên học trước học phần nào giữa lập trình cơ bản và cấu trúc dữ liệu để không bị quá tải?",
+    "expected_behavior": "Agent phân tích trình tự học phù hợp và gợi ý lộ trình học tập dựa trên độ khó và mối quan hệ giữa hai học phần." 
+  },
+  {
+    "id": 6,
     "category": "🔴 Edge Case (Bẫy Guardrail)",
-    "question": "Tra cứu thời tiết ở thành phố Atlantis ngày 32/13/2026.",
-    "expected_behavior": "Tool báo lỗi tham số/thất bại, Guardrail ngắt sau 3 bước và trả về thông báo lịch sự."
+    "question": "Em muốn đăng ký ngành Kiến trúc nhưng điểm năng khiếu vẽ còn yếu, Agent nên tư vấn thế nào?",
+    "expected_behavior": "Agent không gợi ý thẳng vào ngành mà phân tích hạn chế năng khiếu, đề xuất cải thiện năng khiếu hoặc lựa chọn ngành có yêu cầu tương tự nhưng phù hợp hơn." 
+  },
+  {
+    "id": 7,
+    "category": "🔴 Edge Case (Bẫy Guardrail)",
+    "question": "Em thích thiết kế thời trang nhưng không muốn học toán, có nên đổi sang ngành khác?",
+    "expected_behavior": "Agent cân nhắc sở thích và yêu cầu ngành, cảnh báo khi thông tin không phù hợp và đưa ra lựa chọn thay thế hoặc hướng dẫn làm rõ mục tiêu." 
+  },
+  {
+    "id": 8,
+    "category": "🟡 Multi-step (Cần Tool)",
+    "question": "Hồ sơ của em có điểm Toán 8.0, Anh 7.0, em nên đăng ký học phần nào trước để chuẩn bị cho ngành Khoa học dữ liệu?",
+    "expected_behavior": "Agent tra cứu và đề xuất học phần nền tảng phù hợp với ngành Khoa học dữ liệu, chẳng hạn toán rời rạc hoặc lập trình Python." 
   }
 ]
