@@ -17,17 +17,15 @@
 
 ## 🔍 2. SO SÁNH PHẢN HỒI
 
+> ℹ️ **Ghi chú**: Kết quả dưới đây được chạy lại từ `app.py` sau khi `src/prompts.py` được cập nhật (Role 3). `CHATBOT_BASELINE_PROMPT` giữ nguyên nội dung guardrail, nên các phản hồi vẫn phản ánh đúng hành vi hiện tại của Chatbot Baseline. Phần "Nhận xét" tập trung nêu **hạn chế cụ thể** của chatbot ở từng ca — đây là căn cứ để lý giải vì sao cần chuyển sang kiến trúc ReAct Agent có tool.
+
 ### TEST CASE #1
 
 **Câu hỏi**: *"Sinh viên năm nhất nên chuẩn bị những gì để vào đại học không bị bỡ ngỡ?"*
 
 #### 🤖 Chatbot Baseline:
-* **Phản hồi**: *"Chào bạn, tôi là Trợ lý Tư vấn Khóa học của trường. Rất vui được hỗ trợ bạn! Bước chân vào môi trường đại học là một bước ngoặt lớn, và việc cảm thấy bỡ ngỡ ban đầu là hoàn toàn bình thường. Để giúp bạn nhanh chóng thích nghi và tự tin hơn, dưới đây là những sự chuẩn bị quan trọng dành cho một tân sinh viên:*
-  *1. Chuẩn bị về tâm lý và phong cách học tập: Chủ động tìm kiếm tài liệu, đọc trước giáo trình, tư duy tự học, sẵn sàng đối diện với sự khác biệt.*
-  *2. Phát triển các kỹ năng mềm cốt lõi: Quản lý thời gian, kỹ năng số, kỹ năng giao tiếp và thuyết trình.*
-  *3. Định hướng nghề nghiệp sớm: Khám phá bản thân, tìm hiểu thị trường lao động, xây dựng mối quan hệ (networking).*
-  *Nếu trong quá trình học tập, bạn có các thắc mắc liên quan đến lịch học cụ thể, học phí, điểm số cá nhân hoặc thủ tục đăng ký môn học, rất tiếc tôi không có quyền truy cập vào cơ sở dữ liệu của trường để tra cứu trực tiếp. Bạn vui lòng liên hệ trực tiếp với Phòng Đào Tạo để được hỗ trợ chính xác nhất nhé!"*
-* **Nhận xét**: Chatbot trả lời đầy đủ, đúng phạm vi câu hỏi chung (kiến thức phổ quát, không cần dữ liệu thực tế của trường). Đúng như `expected_behavior`, chatbot chủ động từ chối/nhắc nhở khi chạm tới các thông tin cần dữ liệu thực (lịch học, học phí) dù câu hỏi không trực tiếp yêu cầu — cho thấy guardrail trong system prompt hoạt động tốt ngay cả ở câu hỏi đơn giản.
+* **Phản hồi**: *"Chào bạn, tôi là Trợ lý Tư vấn Khóa học Đại học... Để giúp bạn tự tin và sẵn sàng hơn: (1) Chuẩn bị tâm lý và phương pháp học tập: chuyển từ học thụ động sang tự học chủ động, quản lý thời gian, tinh thần chủ động; (2) Kỹ năng mềm: làm việc nhóm, ngoại ngữ/tin học, tài chính cá nhân; (3) Định hướng nghề nghiệp sớm: khám phá bản thân qua CLB, tìm hiểu mô tả công việc tương lai. Nếu có thắc mắc về lịch học, học phí, điểm số cá nhân hoặc đăng ký môn học, tôi không có quyền truy cập dữ liệu của trường, vui lòng liên hệ Phòng Đào Tạo."*
+* **Nhận xét (hạn chế)**: Câu trả lời đúng phạm vi và guardrail hoạt động tốt, nhưng bộc lộ hạn chế cố hữu của chatbot **chỉ dùng LLM**: toàn bộ lời khuyên đến từ kiến thức phổ quát, **không cá nhân hoá theo hồ sơ/ngành học thực tế của sinh viên** và không thể trỏ tới tài nguyên cụ thể của trường (ví dụ: CLB nào đang tuyển, khóa định hướng nhập học nào sắp diễn ra). Đây là dạng câu hỏi chatbot xử lý tốt nhất vì không cần dữ liệu thực.
 
 ---
 
@@ -36,31 +34,18 @@
 **Câu hỏi**: *"Nêu 3 kỹ năng mềm quan trọng mà sinh viên cần phát triển ở năm đầu đại học."*
 
 #### 🤖 Chatbot Baseline:
-* **Phản hồi**: *"Chào bạn! Bước vào năm nhất đại học, môi trường học tập thay đổi rất nhiều so với phổ thông. Dưới đây là 3 kỹ năng mềm quan trọng nhất:*
-  *1. Kỹ năng quản lý thời gian (Time Management): Sử dụng lịch biểu, phân chia thời gian giữa học, làm thêm, câu lạc bộ và nghỉ ngơi.*
-  *2. Kỹ năng thích nghi và tự học (Adaptability & Self-directed Learning): Chủ động tìm tài liệu, đặt câu hỏi, cởi mở với góc nhìn đa dạng.*
-  *3. Kỹ năng giao tiếp và làm việc nhóm (Communication & Teamwork): Tích cực thảo luận, lắng nghe tích cực, thể hiện quan điểm xây dựng."*
-* **Nhận xét**: Chatbot trả lời trực tiếp, đúng trọng tâm câu hỏi (3 kỹ năng: quản lý thời gian, tự học, giao tiếp/làm việc nhóm) — khớp với `expected_behavior`. Không có yêu cầu tra cứu dữ liệu nội bộ nên không kích hoạt guardrail, phù hợp với phân loại "🟢 Đơn giản (Chỉ cần LLM)".
+* **Phản hồi**: *"Ba kỹ năng mềm quan trọng nhất: (1) Quản lý thời gian — dùng lịch/app để phân bổ thời gian học và nghỉ ngơi; (2) Tự học và chủ động nghiên cứu — đọc giáo trình trước, tư duy phản biện; (3) Giao tiếp và làm việc nhóm — lắng nghe, bày tỏ quan điểm, giải quyết mâu thuẫn. Nếu có câu hỏi về lịch học/học phí/điểm số/đăng ký môn, tôi không có quyền truy cập dữ liệu thực tế, vui lòng liên hệ Phòng Đào Tạo."*
+* **Nhận xét (hạn chế)**: Trả lời đúng trọng tâm, khớp `expected_behavior`. Hạn chế: đây là kiến thức "sách giáo khoa" giống nhau cho mọi sinh viên ở mọi ngành — chatbot **không thể ưu tiên hoá theo đặc thù ngành học** (ví dụ sinh viên Kỹ thuật cần kỹ năng khác sinh viên Kinh tế) vì không có tool tra cứu hồ sơ/ngành.
 
 ---
 
 ### TEST CASE #3
 
-**Câu hỏi**: *"Em có điểm học bạ Toán 8.5, Ngữ văn 7.5, Sinh 8.0 và thích công nghệ, em nên chọn chuyên ngành nào phù hợp?"*
+**Câu hỏi**: *"Em có điểm học bạ Toán 8.5, Ngữ văn 7.5, Tiếng Anh 7.0 và thích công nghệ, em nên chọn ngành nào phù hợp?"*
 
 #### 🤖 Chatbot Baseline:
-* **Phản hồi**: *"Với điểm số này và sở thích công nghệ, em có thể cân nhắc các ngành như Công nghệ thông tin, Khoa học máy tính hoặc Khoa học dữ liệu. Hãy lựa chọn ngành có cả nội dung lập trình và ứng dụng công nghệ."*
-* **Nhận xét**: Chatbot trả lời chung chung, không kiểm tra yêu cầu cụ thể của từng ngành và không lấy dữ liệu thực tế về điểm chuẩn, nên dễ thiếu chính xác.
-
-<!-- #### 🧠 ReAct Agent (dự kiến):
-* **Thought 1**: Cần tra cứu yêu cầu điểm và môn chính của ngành Công nghệ thông tin và Khoa học dữ liệu.
-* **Action 1**: `get_course_prerequisites('Công nghệ thông tin')`
-* **Observation 1**: `Yêu cầu: Toán 8.0, Anh 7.0, ưu tiên học sinh có nền tảng lập trình.`
-* **Thought 2**: Kiểm tra nếu hồ sơ phù hợp với ngành này và so sánh với ngành Khoa học dữ liệu.
-* **Action 2**: `get_course_prerequisites('Khoa học dữ liệu')`
-* **Observation 2**: `Yêu cầu: Toán 8.5, Tiếng Anh 7.0, kỹ năng phân tích số liệu được ưu tiên.`
-* **Final Answer**: *"Với điểm Toán 8.5 và niềm đam mê công nghệ, em phù hợp với cả Công nghệ thông tin và Khoa học dữ liệu. Nếu em thích lập trình và ứng dụng phần mềm, chọn Công nghệ thông tin. Nếu em quan tâm phân tích dữ liệu và thống kê, chọn Khoa học dữ liệu."*
-* **Nhận xét**: Agent sẽ tận dụng tool lookup để đưa ra khuyến nghị sát thực tế hơn và giảm rủi ro trả lời bằng trực giác. -->
+* **Phản hồi**: *"Với điểm số và sở thích công nghệ, đây là nền tảng tốt. Gợi ý: (1) CNTT/Kỹ thuật phần mềm — Toán 8.5 và Anh 7.0 phù hợp; (2) An toàn thông tin — cần tư duy logic; (3) Khoa học dữ liệu/AI — kết hợp Toán và công nghệ; (4) Hệ thống thông tin quản lý/Thương mại điện tử — kết hợp công nghệ và kinh tế nhờ Văn 7.5. Tôi không có quyền truy cập dữ liệu tuyển sinh thực tế nên không thể kiểm tra điều kiện trúng tuyển cụ thể, tổ hợp môn hay điểm chuẩn — vui lòng liên hệ Phòng Đào Tạo/Tuyển sinh."*
+* **Nhận xét (hạn chế)**: Đây là **hạn chế rõ nhất** của Chatbot Baseline: liệt kê tới 4 ngành khác nhau nhưng **không xếp hạng hay so sánh dựa trên yêu cầu đầu vào thực tế** (điểm chuẩn, tổ hợp xét tuyển) — vì không có tool `get_course_prerequisites`/`check_course_eligibility`. Sinh viên nhận được danh sách rộng nhưng thiếu căn cứ để chọn 1 ngành cụ thể, dễ gây phân vân thay vì thu hẹp lựa chọn — đúng là ca "🟡 Multi-step (Cần Tool)" mà baseline không đáp ứng được.
 
 ---
 
@@ -69,8 +54,8 @@
 **Câu hỏi**: *"So sánh yêu cầu đầu vào và môn học chính giữa ngành Công nghệ thông tin và Kỹ thuật phần mềm."*
 
 #### 🤖 Chatbot Baseline:
-* **Phản hồi**: *"Chào bạn, tôi là Trợ lý Tư vấn Khóa học của trường... Liên quan đến câu hỏi so sánh giữa Công nghệ thông tin (CNTT) và Kỹ thuật phần mềm (KTPM): (1) Yêu cầu đầu vào: cả hai thường xét tuyển khối A00/A01/D01, CNTT phù hợp với tư duy logic và yêu thích công nghệ nói chung, KTPM đòi hỏi tỉ mỉ và tư duy hệ thống hơn. (2) Môn học chính: CNTT mang tính bao quát (Cấu trúc dữ liệu, Mạng máy tính, Hệ điều hành, Cơ sở dữ liệu...), còn KTPM tập trung sâu vào vòng đời phát triển phần mềm (Phân tích thiết kế hệ thống, Kiểm thử, Kiến trúc phần mềm, Agile/Scrum...). Nếu cần điểm chuẩn/chỉ tiêu/khung chương trình chính xác của trường, tôi không có quyền truy cập dữ liệu nội bộ, vui lòng liên hệ Phòng Đào Tạo."*
-* **Nhận xét**: Chatbot đưa ra được sự khác biệt tổng quát khá hợp lý dựa trên kiến thức chung (broad-base vs. deep-dive), nhưng đây là thông tin mang tính phổ quát của ngành học nói chung, không phải dữ liệu thực tế của trường — đúng như dự đoán ở `expected_behavior`, một ReAct Agent có tool `get_course_prerequisites`/`get_course_detail` sẽ so sánh chính xác theo dữ liệu thật thay vì kiến thức nền chung chung.
+* **Phản hồi**: *"Yêu cầu đầu vào: cả hai xét khối A00/A01/D01, điểm chuẩn KTPM đôi khi nhỉnh hơn CNTT tùy trường; CNTT cần sự bao quát, KTPM cần tỉ mỉ/tư duy hệ thống. Môn học chính: CNTT thiên về Mạng máy tính, An toàn thông tin, Quản trị hệ thống, Điện toán đám mây; KTPM tập trung vòng đời phát triển phần mềm (SDLC): kiến trúc phần mềm, Agile/Scrum, kiểm thử/QA. Không có quyền truy cập mã ngành, chỉ tiêu, học phí, lịch học thực tế của trường."*
+* **Nhận xét (hạn chế)**: Chatbot tự tin đưa ra so sánh chi tiết nhưng đây hoàn toàn là **suy luận từ kiến thức nền tổng quát**, không phải dữ liệu chương trình đào tạo thật của trường — có rủi ro **thông tin không khớp thực tế** (ví dụ danh sách môn học, thứ tự học) nếu chương trình của trường khác với "chuẩn chung" mà LLM giả định. Đây chính là lý do cần ReAct Agent với tool `get_course_detail`/`get_course_prerequisites` để đảm bảo dữ liệu so sánh là thật, không phải suy đoán.
 
 ---
 
@@ -79,8 +64,8 @@
 **Câu hỏi**: *"Em nên học trước học phần nào giữa lập trình cơ bản và cấu trúc dữ liệu để không bị quá tải?"*
 
 #### 🤖 Chatbot Baseline:
-* **Phản hồi**: *"Em phải học Lập trình cơ bản trước. Lập trình cơ bản là nền móng đầu tiên (tư duy logic, cú pháp, biến, vòng lặp, hàm...). Cấu trúc dữ liệu là bước nâng cao hơn, đòi hỏi đã thành thạo lập trình để hiện thực hóa các cấu trúc (mảng, danh sách liên kết, ngăn xếp, hàng đợi, cây...). Lời khuyên: vững căn bản trước, thực hành liên tục. Nếu cần tra lịch trình cụ thể/điểm số/đăng ký môn, tôi không có quyền truy cập dữ liệu thực tế, vui lòng liên hệ Phòng Đào Tạo."*
-* **Nhận xét**: Chatbot trả lời đúng về mặt logic trình tự học (lập trình cơ bản → cấu trúc dữ liệu), phù hợp với `expected_behavior` dù không tra cứu được quan hệ tiên quyết thực tế (`get_course_prerequisites`) từ hệ thống của trường — câu trả lời dựa trên suy luận chung, không phải dữ liệu chương trình đào tạo cụ thể.
+* **Phản hồi**: *"Phải học Lập trình cơ bản trước rồi mới đến Cấu trúc dữ liệu và Giải thuật. Lập trình cơ bản là nền tảng (biến, vòng lặp, hàm, tư duy logic); Cấu trúc dữ liệu đòi hỏi áp dụng thành thạo kỹ năng lập trình để hiện thực hóa (mảng, danh sách liên kết, ngăn xếp, cây...). Lời khuyên: không vội vàng, thực hành nhiều. Không có quyền truy cập hệ thống để kiểm tra mã môn học cụ thể là điều kiện tiên quyết của trường, vui lòng liên hệ Phòng Đào Tạo."*
+* **Nhận xét (hạn chế)**: Logic trình tự đúng theo thông lệ chung, nhưng chatbot **tự nhận hạn chế ngay trong câu trả lời**: không thể xác nhận đây có đúng là điều kiện tiên quyết (prerequisite) chính thức của trường hay không. Nếu chương trình đào tạo thực tế có ràng buộc khác (ví dụ môn nào là bắt buộc song song), chatbot sẽ không phát hiện được vì thiếu tool tra cứu `get_course_prerequisites` theo dữ liệu thật.
 
 ---
 
@@ -89,8 +74,8 @@
 **Câu hỏi**: *"Em muốn đăng ký ngành Kiến trúc nhưng điểm năng khiếu vẽ còn yếu, Agent nên tư vấn thế nào?"*
 
 #### 🤖 Chatbot Baseline:
-* **Phản hồi**: *"Vẽ năng khiếu đầu vào chủ yếu đánh giá khả năng quan sát, tỷ lệ, hình khối, tư duy không gian — có thể rèn luyện được. Lộ trình cải thiện: tham gia lớp luyện thi, xây dựng nền tảng từ khối hình học cơ bản, tận dụng phần mềm hỗ trợ (AutoCAD, Revit, SketchUp...). Phương án dự phòng nếu vẫn khó khăn: Quản lý/Kỹ thuật Xây dựng, Thiết kế Đô thị/Quy hoạch, Thiết kế nội thất/Đồ họa. Không cung cấp được điều kiện xét tuyển/chỉ tiêu cụ thể của trường vì không có quyền truy cập dữ liệu nội bộ."*
-* **Nhận xét**: Đúng như `expected_behavior` — chatbot **không gợi ý thẳng vào ngành** mà phân tích hạn chế năng khiếu, đề xuất lộ trình cải thiện, đồng thời đưa thêm các ngành thay thế có yêu cầu tương tự nhưng phù hợp hơn. Guardrail hoạt động tốt: không hứa hẹn hay tự bịa khả năng trúng tuyển.
+* **Phản hồi**: *"Vẽ trong Kiến trúc là kỹ năng có thể rèn luyện, không cần năng khiếu bẩm sinh — đòi hỏi tư duy hình khối, tỷ lệ hơn là sự bay bổng. Lời khuyên: tham gia lớp luyện thi cấp tốc, kiên trì. Phương án thay thế (Plan B) nếu vẫn khó khăn: Quản lý/Kỹ thuật Xây dựng, Thiết kế Nội thất, Công nghệ số trong Kiến trúc/Quy hoạch đô thị. Không có quyền truy cập điểm chuẩn, tổ hợp xét tuyển, quy chế thi năng khiếu thực tế — vui lòng liên hệ Phòng Đào Tạo/Tuyển sinh."*
+* **Nhận xét (hạn chế)**: Guardrail xử lý đúng tinh thần "không gợi ý thẳng vào ngành". Tuy nhiên hạn chế: lời trấn an "vẽ là kỹ năng có thể rèn luyện, nhiều anh chị khóa trước đạt điểm cao" **không có căn cứ dữ liệu thực** (không biết điểm năng khiếu hiện tại của sinh viên là bao nhiêu, ngưỡng đầu vào thực tế của trường là bao nhiêu) — chatbot đang đưa ra nhận định mang tính động viên chung chung hơn là đánh giá dựa trên hồ sơ cụ thể, dễ tạo kỳ vọng không chính xác nếu khoảng cách năng lực thực tế quá lớn.
 
 ---
 
@@ -99,8 +84,8 @@
 **Câu hỏi**: *"Em thích thiết kế thời trang nhưng không muốn học toán, có nên đổi sang ngành khác?"*
 
 #### 🤖 Chatbot Baseline:
-* **Phản hồi**: *"Ngành Thiết kế Thời trang không đòi hỏi giải toán phức tạp, chỉ toán cơ bản (hình học, đo lường, tỉ lệ) khi dựng rập, tính vải, ngân sách. Trọng tâm ngành là sáng tạo, thẩm mỹ, kỹ thuật vẽ phác thảo và may vá. Nếu vẫn thích thời trang, hoàn toàn có thể theo đuổi vì lượng toán rất ít. Nếu muốn né toán hoàn toàn, có thể tham khảo Ngôn ngữ học, Báo chí, Truyền thông đa phương tiện, Văn học, Quản trị sự kiện — nhưng lưu ý ngành nào cũng có thể có ít môn mang tính số liệu. Lời khuyên: đừng vì sợ toán mà từ bỏ đam mê nếu thực sự có năng khiếu."*
-* **Nhận xét**: Đúng như `expected_behavior` — chatbot cân nhắc cả sở thích lẫn yêu cầu ngành, không vội đưa ra quyết định thay sinh viên mà làm rõ hiểu lầm (toán trong ngành này không nặng), đồng thời gợi ý lựa chọn thay thế nếu sinh viên vẫn kiên quyết né toán. Cách xử lý cân bằng, không cực đoan.
+* **Phản hồi**: *"Không nhất thiết phải đổi ngành. Thiết kế Thời trang thuộc khối nghệ thuật/sáng tạo, tập trung mỹ thuật, kỹ thuật cắt may, phần mềm thiết kế. Toán chỉ ở mức cơ bản (tính vải, tỷ lệ, chi phí), không có công thức phức tạp như Kinh tế/Kỹ thuật. Không có quyền truy cập chương trình đào tạo chi tiết/lịch học/học phí/thủ tục đăng ký của trường, vui lòng liên hệ Phòng Đào Tạo."*
+* **Nhận xét (hạn chế)**: Câu trả lời hợp lý và tránh cực đoan, nhưng hạn chế: khẳng định "toán chỉ ở mức cơ bản" dựa trên **giả định chương trình đào tạo phổ biến**, không kiểm chứng được khung chương trình thực tế của trường (có thể trường yêu cầu môn Toán ứng dụng/Thống kê thời trang mà chatbot không biết). Việc khẳng định chắc chắn trong khi không có dữ liệu xác thực là rủi ro "hallucination nhẹ" mà một ReAct Agent có thể tránh bằng cách gọi `get_course_detail` để lấy chương trình học thật trước khi kết luận.
 
 ---
 
@@ -109,17 +94,20 @@
 **Câu hỏi**: *"Hồ sơ của em có điểm Toán 8.0, Anh 7.0, em nên đăng ký học phần nào trước để chuẩn bị cho ngành Khoa học dữ liệu?"*
 
 #### 🤖 Chatbot Baseline:
-* **Phản hồi**: *"Không có quyền truy cập vào cơ sở dữ liệu cá nhân, hệ thống đăng ký môn học hay danh mục học phần cụ thể của trường nên không thể tra cứu chính xác mã môn/thời khóa biểu. Dựa trên khung chương trình chuẩn chung của ngành Khoa học Dữ liệu, nên ưu tiên: (1) Toán cho Khoa học Dữ liệu (Giải tích, Đại số tuyến tính, Xác suất - Thống kê), (2) Lập trình cơ bản (Python/R), (3) Tiếng Anh chuyên ngành. Khuyên liên hệ Phòng Đào Tạo/Cố vấn học tập để có danh sách học phần chính xác."*
-* **Nhận xét**: Chatbot xử lý đúng guardrail — từ chối tra cứu/đăng ký học phần cụ thể (vì đây là yêu cầu cần dữ liệu thực + đăng ký môn học), nhưng vẫn hữu ích khi đưa ra định hướng nhóm kiến thức nền tảng chung. Đúng như `expected_behavior` về mặt định hướng, tuy chưa thể tra cứu học phần nền tảng chính xác (toán rời rạc, lập trình Python...) như một ReAct Agent có tool `search_courses`/`get_course_prerequisites` sẽ làm được.
+* **Phản hồi**: *"Với nền tảng Toán 8.0 và Anh 7.0, nên ưu tiên: (1) Toán học nền tảng — Giải tích, Đại số tuyến tính, Xác suất thống kê; (2) Lập trình — Nhập môn lập trình/Lập trình cơ bản (Python/R); (3) tiếp tục phát huy Tiếng Anh để đọc tài liệu quốc tế. Không có quyền truy cập hệ thống của trường nên không thể kiểm tra mã học phần cụ thể, điều kiện tiên quyết theo chương trình đào tạo riêng, hay hỗ trợ đăng ký môn — cần tra cứu Khung chương trình đào tạo chính thức hoặc liên hệ Phòng Đào Tạo."*
+* **Nhận xét (hạn chế)**: Chatbot đúng khi từ chối thao tác đăng ký/tra cứu mã môn thật (đúng guardrail), nhưng đây chính là **giới hạn cốt lõi khiến baseline không thể hoàn thành trọn vẹn yêu cầu của người dùng**: câu hỏi cần một danh sách học phần *cụ thể, đúng theo hệ thống của trường* để đăng ký, nhưng chatbot chỉ đưa ra được nhóm kiến thức "nên học" ở mức khái niệm — người dùng vẫn phải tự tra cứu thêm. Đây là minh chứng rõ ràng cho việc **baseline dừng lại ở tư vấn định hướng, không thể thực thi tác vụ multi-step (tra cứu → đối chiếu hồ sơ → đề xuất mã môn cụ thể)** mà một ReAct Agent với `search_courses`/`get_course_prerequisites`/`generate_learning_path` mới xử lý được.
 
 ---
 
-<!-- #### 🧠 ReAct Agent (dự kiến):
-* **Thought 1**: Cần tra cứu yêu cầu điểm và môn chính của ngành Công nghệ thông tin và Khoa học dữ liệu.
-* **Action 1**: `get_course_prerequisites('Công nghệ thông tin')`
-* **Observation 1**: `Yêu cầu: Toán 8.0, Anh 7.0, ưu tiên học sinh có nền tảng lập trình.`
-* **Thought 2**: Kiểm tra nếu hồ sơ phù hợp với ngành này và so sánh với ngành Khoa học dữ liệu.
-* **Action 2**: `get_course_prerequisites('Khoa học dữ liệu')`
-* **Observation 2**: `Yêu cầu: Toán 8.5, Tiếng Anh 7.0, kỹ năng phân tích số liệu được ưu tiên.`
-* **Final Answer**: *"Với điểm Toán 8.5 và niềm đam mê công nghệ, em phù hợp với cả Công nghệ thông tin và Khoa học dữ liệu. Nếu em thích lập trình và ứng dụng phần mềm, chọn Công nghệ thông tin. Nếu em quan tâm phân tích dữ liệu và thống kê, chọn Khoa học dữ liệu."*
-* **Nhận xét**: Agent sẽ tận dụng tool lookup để đưa ra khuyến nghị sát thực tế hơn và giảm rủi ro trả lời bằng trực giác. -->
+## 🎯 3. TỔNG KẾT HẠN CHẾ CỦA CHATBOT BASELINE (TIỀN ĐỀ CHỌN REACT AGENT)
+
+Qua 8 test case, các hạn chế lặp lại nhất quán của Chatbot Baseline là:
+
+1. **Không cá nhân hoá theo dữ liệu thật**: Mọi lời khuyên đều dựa trên kiến thức phổ quát/suy luận chung, không tra cứu được hồ sơ, điểm chuẩn, hay chương trình đào tạo thực tế của sinh viên/trường (TC1, TC2, TC3, TC8).
+2. **Không thể xếp hạng/thu hẹp lựa chọn dựa trên điều kiện thực**: Khi câu hỏi cần so sánh hoặc chọn 1 trong nhiều phương án, chatbot chỉ liệt kê chung chung thay vì đối chiếu với ngưỡng đầu vào thật (TC3, TC4).
+3. **Rủi ro trả lời "chắc như đinh đóng cột" dựa trên giả định**: Chatbot đôi khi khẳng định chắc chắn (VD: "toán chỉ ở mức cơ bản", "vẽ hoàn toàn có thể rèn luyện kịp") mà không có dữ liệu xác thực — tiềm ẩn rủi ro hallucination nhẹ nếu thực tế khác với giả định (TC6, TC7).
+4. **Không thể hoàn thành tác vụ multi-step đến cùng**: Với các câu hỏi cần chuỗi hành động (tra cứu → đối chiếu → đề xuất cụ thể → có thể đăng ký), chatbot luôn phải dừng lại ở bước định hướng và đẩy trách nhiệm tra cứu/thực thi ngược lại cho sinh viên (TC3, TC5, TC8).
+
+➡️ Đây chính là cơ sở thực nghiệm (không chỉ lý thuyết ở bảng chấm điểm mục 1) để khẳng định: dự án **Trợ Lý Tư Vấn Khóa Học Sinh Viên** cần một **ReAct Agent có tool tra cứu dữ liệu thật** (`get_student_profile`, `get_course_prerequisites`, `check_course_eligibility`, `recommend_course`, `generate_learning_path`...) thay vì chỉ dùng LLM thuần, đặc biệt với nhóm câu hỏi "🟡 Multi-step" và "🔴 Edge Case".
+
+> ℹ️ **Ghi chú kỹ thuật**: Hàm `run_react_agent()` trong `app.py` hiện tại vẫn là bản demo cứng (hardcoded, minh họa bằng dữ liệu thời tiết) và chưa được nối với `REACT_SYSTEM_PROMPT` cùng bộ tool tư vấn khóa học thực tế trong `tools.py`. Do đó báo cáo này chưa có phần "ReAct Agent thực chạy" — sẽ bổ sung khi Role 2/3/4 hoàn thiện vòng lặp ReAct thực sự gọi LLM + tool.
