@@ -48,6 +48,50 @@
 #     "search_flights": search_flights,
 # }
 
+from functools import wraps
+
+MOCK_API = {
+    "students": {
+        "SV001": {"name": "Nguyễn Văn A", "major": "Công nghệ thông tin", "year": 2},
+        "SV002": {"name": "Trần Thị B", "major": "Kinh tế", "year": 3},
+        "SV003": {"name": "Lê Văn C", "major": "Điện tử viễn thông", "year": 1},
+    },
+    "skills": {
+        "SV001": ["Python", "Machine Learning", "Data Analysis"],
+        "SV002": ["Marketing", "Sales", "Business Strategy"],
+        "SV003": ["Circuit Design", "Embedded Systems"],
+    },
+    "course_prerequisites": {
+        "CS101": [],
+        "CS201": ["CS101"],
+        "CS301": ["CS201"],
+        "ECON101": [],
+        "ECON201": ["ECON101"],
+    },
+    "course_recommendations": {
+        "SV001": ["CS201", "CS301"],
+        "SV002": ["ECON201", "ECON301"],
+        "SV003": ["EE201", "EE301"],
+    },
+    "course_details": {
+        "CS101": {"title": "Introduction to Computer Science", "instructor": "Dr. A", "schedule": "Mon/Wed 10:00-11:30"},
+        "CS201": {"title": "Data Structures and Algorithms", "instructor": "Dr. B", "schedule": "Tue/Thu 14:00-15:30"},
+        "CS301": {"title": "Machine Learning", "instructor": "Dr. C", "schedule": "Mon/Wed 16:00-17:30"},
+        "ECON101": {"title": "Principles of Economics", "instructor": "Dr. D", "schedule": "Tue/Thu 10:00-11:30"},
+        "ECON201": {"title": "Microeconomics", "instructor": "Dr. E", "schedule": "Mon/Wed 14:00-15:30"},
+    },
+    "learning_paths": {
+        "SV001": ["CS101", "CS201", "CS301"],
+        "SV002": ["ECON101", "ECON201", "ECON301"],
+        "SV003": ["EE101", "EE201", "EE301"],
+    },
+    "schedules": {
+        "SV001": {"Mon": ["CS101 10:00-11:30"], "Wed": ["CS201 14:00-15:30"]},
+        "SV002": {"Tue": ["ECON101 10:00-11:30"], "Thu": ["ECON201 14:00-15:30"]},
+        "SV003": {"Mon": ["EE101 10:00-11:30"], "Wed": ["EE201 14:00-15:30"]},
+    },
+}
+
 # Các tool hiện có:
 # - get_student_profile: Lấy hồ sơ sinh viên, bao gồm thông tin cá nhân và học tập.
 # - check_actived_skills: Kiểm tra kỹ năng đang được kích hoạt hoặc khả dụng cho sinh viên.
@@ -59,6 +103,18 @@
 # - generate_learning_path: Sinh lộ trình học tập cá nhân hóa cho sinh viên.
 # - find_schedule: Tìm thời khóa biểu hoặc lịch học phù hợp.
 # - register_course: Đăng ký khóa học cho sinh viên.
+
+
+def _tool_error_handler(func):
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        try:
+            return func(*args, **kwargs)
+        except Exception as exc:
+            return f"LỖI: {func.__name__} - {str(exc)}"
+    return wrapper
+
+@_tool_error_handler
 def get_student_profile(student_id: str) -> dict:
     """
     Lấy hồ sơ sinh viên dựa trên ID sinh viên.
@@ -69,14 +125,9 @@ def get_student_profile(student_id: str) -> dict:
     Returns:
         dict: Thông tin hồ sơ sinh viên
     """
-    # Giả lập dữ liệu hồ sơ sinh viên
-    profiles = {
-        "SV001": {"name": "Nguyễn Văn A", "major": "Công nghệ thông tin", "year": 2},
-        "SV002": {"name": "Trần Thị B", "major": "Kinh tế", "year": 3},
-        "SV003": {"name": "Lê Văn C", "major": "Điện tử viễn thông", "year": 1},
-    }
-    return profiles.get(student_id, {"error": f"Không tìm thấy hồ sơ cho ID '{student_id}'."})
+    return MOCK_API["students"].get(student_id, {"error": f"Không tìm thấy hồ sơ cho ID '{student_id}'."})
 
+@_tool_error_handler
 def check_actived_skills(student_id: str) -> list:
     """
     Kiểm tra các kỹ năng đang được kích hoạt cho sinh viên.
@@ -87,14 +138,9 @@ def check_actived_skills(student_id: str) -> list:
     Returns:
         list: Danh sách kỹ năng đang được kích hoạt
     """
-    # Giả lập dữ liệu kỹ năng
-    skills = {
-        "SV001": ["Python", "Machine Learning", "Data Analysis"],
-        "SV002": ["Marketing", "Sales", "Business Strategy"],
-        "SV003": ["Circuit Design", "Embedded Systems"],
-    }
-    return skills.get(student_id, [])
+    return MOCK_API["skills"].get(student_id, [])
 
+@_tool_error_handler
 def get_course_prerequisites(course_id: str) -> list:
     """
     Lấy điều kiện tiên quyết của một khóa học cụ thể.
@@ -105,16 +151,9 @@ def get_course_prerequisites(course_id: str) -> list:
     Returns:
         list: Danh sách các khóa học tiên quyết
     """
-    # Giả lập dữ liệu điều kiện tiên quyết
-    prerequisites = {
-        "CS101": [],
-        "CS201": ["CS101"],
-        "CS301": ["CS201"],
-        "ECON101": [],
-        "ECON201": ["ECON101"],
-    }
-    return prerequisites.get(course_id, [])
+    return MOCK_API["course_prerequisites"].get(course_id, [])
 
+@_tool_error_handler
 def recommend_course(student_id: str) -> list:
     """
     Đề xuất khóa học phù hợp dựa trên hồ sơ và mục tiêu học tập của sinh viên.
@@ -125,14 +164,9 @@ def recommend_course(student_id: str) -> list:
     Returns:
         list: Danh sách khóa học được đề xuất
     """
-    # Giả lập dữ liệu đề xuất khóa học
-    recommendations = {
-        "SV001": ["CS201", "CS301"],
-        "SV002": ["ECON201", "ECON301"],
-        "SV003": ["EE201", "EE301"],
-    }
-    return recommendations.get(student_id, [])
+    return MOCK_API["course_recommendations"].get(student_id, [])
 
+@_tool_error_handler
 def search_courses(keyword: str) -> list:
     """
     Tìm kiếm khóa học theo từ khóa.
@@ -143,16 +177,9 @@ def search_courses(keyword: str) -> list:
     Returns:
         list: Danh sách khóa học phù hợp
     """
-    # Giả lập dữ liệu khóa học
-    courses = {
-        "CS101": "Introduction to Computer Science",
-        "CS201": "Data Structures and Algorithms",
-        "CS301": "Machine Learning",
-        "ECON101": "Principles of Economics",
-        "ECON201": "Microeconomics",
-    }
-    return [course_id for course_id, title in courses.items() if keyword.lower() in title.lower()]
+    return [course_id for course_id, title in MOCK_API["course_details"].items() if keyword.lower() in title["title"].lower()]
 
+@_tool_error_handler
 def get_course_detail(course_id: str) -> dict:
     """
     Lấy chi tiết về một khóa học cụ thể.
@@ -163,16 +190,12 @@ def get_course_detail(course_id: str) -> dict:
     Returns:
         dict: Thông tin chi tiết về khóa học
     """
-    # Giả lập dữ liệu chi tiết khóa học
-    course_details = {
-        "CS101": {"title": "Introduction to Computer Science", "instructor": "Dr. A", "schedule": "Mon/Wed 10:00-11:30"},
-        "CS201": {"title": "Data Structures and Algorithms", "instructor": "Dr. B", "schedule": "Tue/Thu 14:00-15:30"},
-        "CS301": {"title": "Machine Learning", "instructor": "Dr. C", "schedule": "Mon/Wed 16:00-17:30"},
-        "ECON101": {"title": "Principles of Economics", "instructor": "Dr. D", "schedule": "Tue/Thu 10:00-11:30"},
-        "ECON201": {"title": "Microeconomics", "instructor": "Dr. E", "schedule": "Mon/Wed 14:00-15:30"},
-    }
-    return course_details.get(course_id, {"error": f"Không tìm thấy chi tiết cho khóa học '{course_id}'."})
+    return MOCK_API["course_details"].get(course_id, {"error": f"Không tìm thấy chi tiết cho khóa học '{course_id}'."})
 
+def _is_error_result(result):
+    return isinstance(result, str) and result.startswith("LỖI:")
+
+@_tool_error_handler
 def check_course_eligibility(student_id: str, course_id: str) -> bool:
     """
     Kiểm tra sinh viên có đủ điều kiện đăng ký khóa học hay không.
@@ -185,9 +208,19 @@ def check_course_eligibility(student_id: str, course_id: str) -> bool:
         bool: True nếu đủ điều kiện, False nếu không
     """
     prerequisites = get_course_prerequisites(course_id)
+    if _is_error_result(prerequisites):
+        return False
+
     student_courses = recommend_course(student_id)  # Giả lập danh sách khóa học đã hoàn thành
+    if _is_error_result(student_courses):
+        return False
+
+    if not isinstance(prerequisites, list) or not isinstance(student_courses, list):
+        return False
+
     return all(prereq in student_courses for prereq in prerequisites)
 
+@_tool_error_handler
 def generate_learning_path(student_id: str) -> list:
     """
     Sinh lộ trình học tập cá nhân hóa cho sinh viên.
@@ -198,14 +231,9 @@ def generate_learning_path(student_id: str) -> list:
     Returns:
         list: Danh sách khóa học trong lộ trình học tập
     """
-    # Giả lập dữ liệu lộ trình học tập
-    learning_paths = {
-        "SV001": ["CS101", "CS201", "CS301"],
-        "SV002": ["ECON101", "ECON201", "ECON301"],
-        "SV003": ["EE101", "EE201", "EE301"],
-    }
-    return learning_paths.get(student_id, [])
+    return MOCK_API["learning_paths"].get(student_id, [])
 
+@_tool_error_handler
 def find_schedule(student_id: str) -> dict:
     """
     Tìm thời khóa biểu hoặc lịch học phù hợp cho sinh viên.
@@ -216,14 +244,9 @@ def find_schedule(student_id: str) -> dict:
     Returns:
         dict: Thời khóa biểu của sinh viên
     """
-    # Giả lập dữ liệu thời khóa biểu
-    schedules = {
-        "SV001": {"Mon": ["CS101 10:00-11:30"], "Wed": ["CS201 14:00-15:30"]},
-        "SV002": {"Tue": ["ECON101 10:00-11:30"], "Thu": ["ECON201 14:00-15:30"]},
-        "SV003": {"Mon": ["EE101 10:00-11:30"], "Wed": ["EE201 14:00-15:30"]},
-    }
-    return schedules.get(student_id, {"error": f"Không tìm thấy thời khóa biểu cho ID '{student_id}'."})
+    return MOCK_API["schedules"].get(student_id, {"error": f"Không tìm thấy thời khóa biểu cho ID '{student_id}'."})
 
+@_tool_error_handler
 def register_course(student_id: str, course_id: str) -> str:
     """
     Đăng ký khóa học cho sinh viên.
@@ -235,11 +258,16 @@ def register_course(student_id: str, course_id: str) -> str:
     Returns:
         str: Thông báo kết quả đăng ký
     """
-    if check_course_eligibility(student_id, course_id):
+    eligibility = check_course_eligibility(student_id, course_id)
+    if isinstance(eligibility, str) and eligibility.startswith("LỖI:"):
+        return f"LỖI: register_course - Không thể kiểm tra điều kiện đăng ký do lỗi hệ thống."
+
+    if eligibility:
         return f"Đăng ký thành công khóa học '{course_id}' cho sinh viên '{student_id}'."
     else:
         return f"Không đủ điều kiện đăng ký khóa học '{course_id}' cho sinh viên '{student_id}'."
     
+@_tool_error_handler
 def count_tools_used(memory: list) -> int:
     """
     Đếm số lần các tool đã được gọi trong bộ nhớ của Agent.
@@ -251,3 +279,17 @@ def count_tools_used(memory: list) -> int:
         int: Số lần tool được gọi
     """
     return sum(1 for entry in memory if "action" in entry and entry["action"].startswith("Call Tool"))
+
+AVAILABLE_TOOLS = {
+    "get_student_profile": get_student_profile,
+    "check_actived_skills": check_actived_skills,
+    "get_course_prerequisites": get_course_prerequisites,
+    "recommend_course": recommend_course,
+    "search_courses": search_courses,
+    "get_course_detail": get_course_detail,
+    "check_course_eligibility": check_course_eligibility,
+    "generate_learning_path": generate_learning_path,
+    "find_schedule": find_schedule,
+    "register_course": register_course,
+    "count_tools_used": count_tools_used,
+}
